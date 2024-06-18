@@ -21,6 +21,7 @@ public class GameOfLifeCommand implements TabExecutor {
 
 	private GameOfLifeComputer computer;
 	private GameOfLifePlugin plugin = GameOfLifePlugin.getPlugin();
+	private int rate = 10;
 
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		
@@ -40,6 +41,7 @@ public class GameOfLifeCommand implements TabExecutor {
 					player.sendMessage("§f/gol start§8: Starts the Game of Life");
 					player.sendMessage("§f/gol stop§8: Stops the Game of Life");
 					player.sendMessage("§f/gol clear§8: Clears all the living fields");
+					player.sendMessage("§f/gol rate 1-20§8: Sets the rate at which the Game of Life is updated per second (1-20)");
 					player.sendMessage("");
 					player.sendMessage("§7-------<§fGame §8of §fLife§7>-------");
 				} else if (args.length == 1) {
@@ -59,7 +61,7 @@ public class GameOfLifeCommand implements TabExecutor {
 						
 						if (!plugin.isRunning()) {
 							computer = new GameOfLifeComputer(Bukkit.getWorld(GameOfLifePlugin.WORLD_NAME));
-							computer.runTaskTimer(plugin, 0, 10);
+							computer.runTaskTimer(plugin, 0, rate);
 							plugin.setRunning(true);
 							player.sendMessage("§2Started the §fGame §8of §fLife §2!");
 						} else {
@@ -89,7 +91,31 @@ public class GameOfLifeCommand implements TabExecutor {
 						} else {
 							player.sendMessage("§cThe §fGame §8of §fLife §cis running, please stop it first!");
 						}
+					} else if (args[0].equalsIgnoreCase("rate")) {
+						player.sendMessage("§2The current rate is §a" + rate + "§2.");
+						player.sendMessage("§2To change it, run this command followed by the rate (1-20)");
 					}
+				} else if (args.length == 2 && args[0].equalsIgnoreCase("rate")) {
+					int newRate;
+					
+					try {
+						newRate = Integer.parseInt(args[1]);
+					} catch (NumberFormatException e) {
+						player.sendMessage("§cThis is not a number! Please input a number between 1 and 20");
+						return false;
+					}
+					
+					if (newRate < 1 || newRate > 20) {
+						player.sendMessage("§cThis is not a valid number! Please input a number between 1 and 20");
+						return false;
+					}
+					
+					rate = newRate;
+					
+					computer.cancel();
+					computer = new GameOfLifeComputer(Bukkit.getWorld(GameOfLifePlugin.WORLD_NAME));
+					computer.runTaskTimer(plugin, 1, rate);
+					player.sendMessage("§2Set the rate to §a" + rate + "§2!");
 				} else
 					player.sendMessage("§cToo many arguments! Use §6/gol [tp,start,stop,clear]§c!");
 			} else
@@ -118,6 +144,9 @@ public class GameOfLifeCommand implements TabExecutor {
 			completions.add("start");
 			completions.add("stop");
 			completions.add("clear");
+			completions.add("rate");
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("rate")) {
+			completions.add("10");
 		}
 		
 		return completions;
