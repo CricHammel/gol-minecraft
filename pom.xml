@@ -5,18 +5,6 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>GameOfLife</name>
   <description>A simple implementation of Conway's Game of Life as a Minecraft plugin</description>
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <release>15</release>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <repositories>
 		<repository>
 			<id>spigot-repo</id>
