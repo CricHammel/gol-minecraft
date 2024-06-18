@@ -1,0 +1,8 @@
+name: GameOfLifePlugin
+version: 1.0
+main: de.cric_hammel.gameOfLifePlugin.main.GameOfLifePlugin
+api-version: 1.20
+
+commands:
+   gol:
+      description: Access all Game of Life commands
