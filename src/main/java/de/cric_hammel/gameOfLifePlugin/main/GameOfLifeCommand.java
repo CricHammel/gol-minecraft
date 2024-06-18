@@ -72,7 +72,7 @@ public class GameOfLifeCommand implements TabExecutor {
 						if (plugin.isRunning()) {
 							computer.cancel();
 							plugin.setRunning(false);
-							player.sendMessage("§2Stopped the §fGame §8of §fLife §2!");
+							player.sendMessage("§2Stopped the §fGame §8of §fLife §2after §a" + computer.getGens() + " §2generations §2!");
 						} else {
 							player.sendMessage("§cThe §fGame §8of §fLife §cis not running!");
 						}
@@ -112,9 +112,12 @@ public class GameOfLifeCommand implements TabExecutor {
 					
 					rate = newRate;
 					
-					computer.cancel();
-					computer = new GameOfLifeComputer(Bukkit.getWorld(GameOfLifePlugin.WORLD_NAME));
-					computer.runTaskTimer(plugin, 1, rate);
+					if (plugin.isRunning()) {
+						computer.cancel();
+						computer = new GameOfLifeComputer(Bukkit.getWorld(GameOfLifePlugin.WORLD_NAME), computer.getGens());
+						computer.runTaskTimer(plugin, 1, rate);
+					}
+					
 					player.sendMessage("§2Set the rate to §a" + rate + "§2!");
 				} else
 					player.sendMessage("§cToo many arguments! Use §6/gol [tp,start,stop,clear]§c!");

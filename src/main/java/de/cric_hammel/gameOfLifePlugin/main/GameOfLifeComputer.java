@@ -12,6 +12,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+
 public class GameOfLifeComputer extends BukkitRunnable {
 
 	private Map<String, Block> livingBlocks;
@@ -20,12 +23,18 @@ public class GameOfLifeComputer extends BukkitRunnable {
 	private Set<Block> toBeBorn = new HashSet<>();
 	private World world;
 	private GameOfLifePlugin plugin;
+	private int gens = 0;
 
 	public GameOfLifeComputer(World world) {
 		super();
 		this.world = world;
 		plugin = GameOfLifePlugin.getPlugin();
 		livingBlocks = plugin.getLivingBlocks();
+	}
+	
+	public GameOfLifeComputer(World world, int gens) {
+		this(world);
+		this.gens = gens;
 	}
 
 	@Override
@@ -34,7 +43,7 @@ public class GameOfLifeComputer extends BukkitRunnable {
 		if (world.getPlayers().size() != 0) {
 			
 			if (livingBlocks.isEmpty()) {
-				world.getPlayers().forEach(p -> p.sendMessage("§cThe §fGame §8of §fLife §cwas stopped because there are no living blocks left!"));
+				world.getPlayers().forEach(p -> p.sendMessage("§cThe §fGame §8of §fLife §cwas stopped after §2" + gens + " §agenerations §cbecause there are no living blocks left!"));
 				plugin.setRunning(false);
 				this.cancel();
 				return;
@@ -43,8 +52,10 @@ public class GameOfLifeComputer extends BukkitRunnable {
 			computeLivingBlocks();
 			computeDeadBlocks();
 			renderBlocks();
+			gens++;
+			world.getPlayers().forEach(p -> p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("§2Generations: §a" + gens)));
 		} else {
-			Bukkit.getServer().broadcastMessage("§cThe §fGame §8of §fLife §cwas stopped because there are no players in the world anymore!");
+			Bukkit.getServer().broadcastMessage("§cThe §fGame §8of §fLife §cwas stopped after §2" + gens + " §agenerations §cbecause there are no players in the world anymore!");
 			plugin.setRunning(false);
 			this.cancel();
 		}
@@ -116,5 +127,9 @@ public class GameOfLifeComputer extends BukkitRunnable {
 		}
 		
 		return count;
+	}
+	
+	public int getGens() {
+		return gens;
 	}
 }
